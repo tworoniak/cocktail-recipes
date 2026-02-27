@@ -5,22 +5,29 @@ import { Button } from '../../components/ui/Button/Button';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useFavorites } from '../../features/favorites/useFavorites';
+
+import { CocktailGrid } from '../../components/cocktails/CocktailGrid/CocktailGrid';
+import styles from './SearchPage.module.scss';
 import {
+  filterCocktailsByIngredient,
   getRandomCocktail,
   searchCocktailsByName,
 } from '../../services/cocktaildb';
-import { CocktailGrid } from '../../components/cocktails/CocktailGrid/CocktailGrid';
-import styles from './SearchPage.module.scss';
 
 export function SearchPage() {
   const [term, setTerm] = useState('');
+  const [mode, setMode] = useState<'name' | 'ingredient'>('name');
+
   const debounced = useDebounce(term, 350);
 
   const { favoritesSet, toggleFavorite } = useFavorites();
 
   const searchQuery = useQuery({
-    queryKey: ['cocktails', 'search', debounced],
-    queryFn: () => searchCocktailsByName(debounced),
+    queryKey: ['cocktails', mode, debounced],
+    queryFn: () =>
+      mode === 'name'
+        ? searchCocktailsByName(debounced)
+        : filterCocktailsByIngredient(debounced),
     enabled: debounced.trim().length > 0,
   });
 
@@ -44,18 +51,38 @@ export function SearchPage() {
           Search by name (e.g. “margarita”, “negroni”, “old fashioned”).
         </p>
 
+        <div className={styles.modeRow}>
+          <button
+            type='button'
+            className={`${styles.modeBtn} ${mode === 'name' ? styles.modeActive : ''}`}
+            onClick={() => setMode('name')}
+          >
+            Name
+          </button>
+          <button
+            type='button'
+            className={`${styles.modeBtn} ${mode === 'ingredient' ? styles.modeActive : ''}`}
+            onClick={() => setMode('ingredient')}
+          >
+            Ingredient
+          </button>
+        </div>
         <div className={styles.controls}>
           <Input
             value={term}
             onChange={(e) => setTerm(e.target.value)}
-            placeholder='Search cocktails...'
+            placeholder={
+              mode === 'name'
+                ? 'Search cocktails (e.g. margarita)...'
+                : 'Search by ingredient (e.g. gin)...'
+            }
             aria-label='Search cocktails'
           />
           <Button
             type='button'
             variant='ghost'
             onClick={() => randomQuery.refetch()}
-            disabled={randomQuery.isFetching}
+            disabled={randomQuery.isFetching || mode === 'ingredient'}
           >
             Random
           </Button>
@@ -92,7 +119,10 @@ export function SearchPage() {
         <div className={styles.error}>Something went wrong. Try again.</div>
       )}
       {showEmpty && (
-        <div className={styles.empty}>No results for “{debounced}”.</div>
+        <div className={styles.empty}>
+          No results for {mode === 'name' ? 'name' : 'ingredient'} “{debounced}
+          ”.
+        </div>
       )}
 
       {cocktails.length > 0 && (
