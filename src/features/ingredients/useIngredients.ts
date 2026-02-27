@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listIngredients } from '../../services/cocktaildb';
+import { useDebounce } from '../../hooks/useDebounce';
 
 export function useIngredientAutocomplete() {
   const [input, setInput] = useState('');
+  const debounced = useDebounce(input, 200);
 
   const q = useQuery({
     queryKey: ['ingredients', 'list'],
@@ -13,17 +15,19 @@ export function useIngredientAutocomplete() {
 
   const suggestions = useMemo(() => {
     const all = q.data ?? [];
-    const term = input.trim().toLowerCase();
+    const term = debounced.trim().toLowerCase();
     if (!term) return [];
+
     return all.filter((x) => x.toLowerCase().includes(term)).slice(0, 10);
-  }, [q.data, input]);
+  }, [q.data, debounced]);
 
   return {
     input,
     setInput,
-    allIngredients: q.data ?? [],
+    debouncedInput: debounced,
     suggestions,
     isLoading: q.isLoading,
+    isFetching: q.isFetching,
     isError: q.isError,
   };
 }
