@@ -8,7 +8,7 @@ import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useFavorites } from '../../features/favorites/useFavorites';
 import { useIngredientAutocomplete } from '../../features/ingredients/useIngredients';
-
+import { SkeletonGrid } from '../../components/cocktails/SkeletonGrid/SkeletonGrid';
 import {
   filterCocktailsByIngredients,
   getRandomCocktail,
@@ -333,7 +333,7 @@ export function SearchPage() {
       </div>
 
       {/* Results area */}
-      {searchQuery.isLoading && <Spinner label='Searching...' />}
+      {searchQuery.isLoading && <SkeletonGrid count={12} />}
 
       {searchQuery.isError && (
         <div className={styles.error}>Something went wrong. Try again.</div>
