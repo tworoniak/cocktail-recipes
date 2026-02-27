@@ -1,9 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import styles from './App.module.scss';
+import ScrollToTop from '../components/ui/Scroll/ScrollToTop';
+import ScrollToTopButton from '../components/ui/Scroll/ScrollToTopButton';
 
 export default function App() {
   return (
     <div className={styles.shell}>
+      <ScrollToTop />
       <header className={styles.header}>
         <div className={styles.brand}>🍸 Cocktail Recipes</div>
 
@@ -26,6 +29,7 @@ export default function App() {
       <main className={styles.main}>
         <Outlet />
       </main>
+      <ScrollToTopButton />
     </div>
   );
 }
