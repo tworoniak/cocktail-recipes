@@ -4,6 +4,10 @@ type Props = React.InputHTMLAttributes<HTMLInputElement>;
 
 export function Input(props: Props) {
   return (
-    <input {...props} className={`${styles.input} ${props.className ?? ''}`} />
+    <input
+      id='search'
+      {...props}
+      className={`${styles.input} ${props.className ?? ''}`}
+    />
   );
 }

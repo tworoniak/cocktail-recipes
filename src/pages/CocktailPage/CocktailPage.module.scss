@@ -1,3 +1,5 @@
+@use '../../styles/abstracts' as *;
+
 .page {
   display: grid;
   gap: 18px;
@@ -9,7 +11,11 @@
   border-radius: 18px;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 1fr;
+
+  @include respond($bp-md) {
+    grid-template-columns: 320px 1fr;
+  }
 }
 
 .hero {
