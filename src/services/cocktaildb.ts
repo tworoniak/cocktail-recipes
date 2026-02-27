@@ -36,6 +36,21 @@ type CocktailDbFilterResponse = {
   drinks: CocktailDbFilterDrink[] | null;
 };
 
+type CocktailDbIngredientListItem = { strIngredient1: string };
+type CocktailDbIngredientListResponse = {
+  drinks: CocktailDbIngredientListItem[] | null;
+};
+
+export async function listIngredients(): Promise<string[]> {
+  const data = await fetchJson<CocktailDbIngredientListResponse>(
+    `${API_BASE}/list.php?i=list`,
+  );
+  return (data.drinks ?? [])
+    .map((d) => d.strIngredient1)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+}
+
 function mapFilterDrinkToCocktail(drink: CocktailDbFilterDrink): Cocktail {
   return {
     id: drink.idDrink,
@@ -60,6 +75,31 @@ export async function filterCocktailsByIngredient(
   );
 
   return (data.drinks ?? []).map(mapFilterDrinkToCocktail);
+}
+
+export async function filterCocktailsByIngredients(
+  ingredients: string[],
+): Promise<Cocktail[]> {
+  const cleaned = ingredients.map((s) => s.trim()).filter(Boolean);
+  if (cleaned.length === 0) return [];
+  if (cleaned.length === 1) return filterCocktailsByIngredient(cleaned[0]);
+
+  const lists = await Promise.all(cleaned.map(filterCocktailsByIngredient));
+
+  // Intersect by cocktail id (must contain all ingredients)
+  const counts = new Map<string, { c: Cocktail; n: number }>();
+
+  for (const list of lists) {
+    for (const c of list) {
+      const entry = counts.get(c.id);
+      if (!entry) counts.set(c.id, { c, n: 1 });
+      else counts.set(c.id, { c: entry.c, n: entry.n + 1 });
+    }
+  }
+
+  return [...counts.values()]
+    .filter((x) => x.n === cleaned.length)
+    .map((x) => x.c);
 }
 
 export type CocktailDbDrink = {

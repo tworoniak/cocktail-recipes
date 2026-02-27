@@ -36,6 +36,8 @@ Search cocktails by **name** or **ingredient**, view details, and save your favo
 - Filter by ingredient: filter.php?i=...
 - Lookup by id: lookup.php?i=...
 - Random: random.php
+- Ingredient autocomplete uses list.php?i=list
+- Multi-ingredient matching is done by intersecting multiple filter.php?i= calls (free-tier workaround) since native multi-ingredient filtering is Premium-only
 
 Note: ingredient filtering returns “light” results (id/name/thumb). Full details are fetched on the details page.
 

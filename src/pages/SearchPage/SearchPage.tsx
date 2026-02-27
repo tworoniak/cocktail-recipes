@@ -5,11 +5,11 @@ import { Button } from '../../components/ui/Button/Button';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useFavorites } from '../../features/favorites/useFavorites';
-
+import { useIngredientAutocomplete } from '../../features/ingredients/useIngredients';
 import { CocktailGrid } from '../../components/cocktails/CocktailGrid/CocktailGrid';
 import styles from './SearchPage.module.scss';
 import {
-  filterCocktailsByIngredient,
+  filterCocktailsByIngredients,
   getRandomCocktail,
   searchCocktailsByName,
 } from '../../services/cocktaildb';
@@ -17,18 +17,24 @@ import {
 export function SearchPage() {
   const [term, setTerm] = useState('');
   const [mode, setMode] = useState<'name' | 'ingredient'>('name');
-
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const debounced = useDebounce(term, 350);
-
+  const ia = useIngredientAutocomplete();
   const { favoritesSet, toggleFavorite } = useFavorites();
 
   const searchQuery = useQuery({
-    queryKey: ['cocktails', mode, debounced],
+    queryKey:
+      mode === 'name'
+        ? ['cocktails', 'name', debounced]
+        : ['cocktails', 'ingredients', selectedIngredients],
     queryFn: () =>
       mode === 'name'
         ? searchCocktailsByName(debounced)
-        : filterCocktailsByIngredient(debounced),
-    enabled: debounced.trim().length > 0,
+        : filterCocktailsByIngredients(selectedIngredients),
+    enabled:
+      mode === 'name'
+        ? debounced.trim().length > 0
+        : selectedIngredients.length > 0,
   });
 
   const randomQuery = useQuery({
@@ -39,9 +45,23 @@ export function SearchPage() {
 
   const cocktails = searchQuery.data ?? [];
   const showEmpty =
-    debounced.trim().length > 0 &&
-    !searchQuery.isLoading &&
-    cocktails.length === 0;
+    searchQuery.isFetched && !searchQuery.isLoading && cocktails.length === 0;
+
+  function addIngredient(value: string) {
+    const v = value.trim();
+    if (!v) return;
+
+    setSelectedIngredients((prev) => {
+      const exists = prev.some((x) => x.toLowerCase() === v.toLowerCase());
+      return exists ? prev : [...prev, v];
+    });
+
+    ia.setInput('');
+  }
+
+  function removeIngredient(value: string) {
+    setSelectedIngredients((prev) => prev.filter((x) => x !== value));
+  }
 
   return (
     <div className={styles.page}>
@@ -64,29 +84,100 @@ export function SearchPage() {
             className={`${styles.modeBtn} ${mode === 'ingredient' ? styles.modeActive : ''}`}
             onClick={() => setMode('ingredient')}
           >
-            Ingredient
+            Ingredients
           </button>
         </div>
-        <div className={styles.controls}>
-          <Input
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-            placeholder={
-              mode === 'name'
-                ? 'Search cocktails (e.g. margarita)...'
-                : 'Search by ingredient (e.g. gin)...'
-            }
-            aria-label='Search cocktails'
-          />
-          <Button
-            type='button'
-            variant='ghost'
-            onClick={() => randomQuery.refetch()}
-            disabled={randomQuery.isFetching || mode === 'ingredient'}
-          >
-            Random
-          </Button>
-        </div>
+        {mode === 'name' ? (
+          <div className={styles.controls}>
+            <Input
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              placeholder='Search cocktails (e.g. margarita)...'
+              aria-label='Search cocktails'
+            />
+            <Button
+              type='button'
+              variant='ghost'
+              onClick={() => randomQuery.refetch()}
+              disabled={randomQuery.isFetching}
+            >
+              Random
+            </Button>
+          </div>
+        ) : (
+          <div className={styles.ingredientArea}>
+            <div className={styles.controls}>
+              <Input
+                value={ia.input}
+                onChange={(e) => ia.setInput(e.target.value)}
+                placeholder='Add an ingredient (e.g. gin, lime)...'
+                aria-label='Ingredient input'
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addIngredient(ia.input);
+                  }
+                  if (e.key === 'Escape') ia.setInput('');
+                }}
+              />
+              <Button
+                type='button'
+                variant='ghost'
+                onClick={() => addIngredient(ia.input)}
+              >
+                Add
+              </Button>
+            </div>
+
+            {ia.suggestions.length > 0 && (
+              <div
+                className={styles.suggestBox}
+                role='listbox'
+                aria-label='Ingredient suggestions'
+              >
+                {ia.suggestions.map((s) => (
+                  <button
+                    key={s}
+                    type='button'
+                    className={styles.suggestItem}
+                    onClick={() => addIngredient(s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {selectedIngredients.length > 0 && (
+              <div className={styles.chips}>
+                {selectedIngredients.map((ing) => (
+                  <button
+                    key={ing}
+                    type='button'
+                    className={styles.chip}
+                    onClick={() => removeIngredient(ing)}
+                    title='Remove ingredient'
+                  >
+                    {ing} <span aria-hidden='true'>×</span>
+                  </button>
+                ))}
+
+                <Button
+                  type='button'
+                  variant='ghost'
+                  onClick={() => setSelectedIngredients([])}
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
+
+            <div className={styles.hint}>
+              Results show cocktails that include <strong>all</strong> selected
+              ingredients.
+            </div>
+          </div>
+        )}
 
         {randomQuery.isFetching && (
           <Spinner label='Finding a random cocktail...' />
@@ -120,8 +211,9 @@ export function SearchPage() {
       )}
       {showEmpty && (
         <div className={styles.empty}>
-          No results for {mode === 'name' ? 'name' : 'ingredient'} “{debounced}
-          ”.
+          {mode === 'name'
+            ? `No results for “${debounced}”.`
+            : `No cocktails found with: ${selectedIngredients.join(', ')}`}
         </div>
       )}
 
