@@ -1,28 +1,25 @@
-import { useMemo } from 'react';
-import type { Cocktail } from '../../types/cocktail';
-import { useLocalStorageState } from '../../hooks/useLocalStorageState';
 import { CocktailGrid } from '../../components/cocktails/CocktailGrid/CocktailGrid';
+import { Button } from '../../components/ui/Button/Button';
+import { useFavorites } from '../../features/favorites/useFavorites';
 import styles from './FavoritesPage.module.scss';
 
-const FAV_KEY = 'cocktail_favorites_v1';
-
 export function FavoritesPage() {
-  const [favorites, setFavorites] = useLocalStorageState<Cocktail[]>(
-    FAV_KEY,
-    [],
-  );
-  const favoritesSet = useMemo(
-    () => new Set(favorites.map((f) => f.id)),
-    [favorites],
-  );
-
-  function toggleFavorite(c: Cocktail) {
-    setFavorites((prev) => prev.filter((x) => x.id !== c.id));
-  }
+  const { favorites, favoritesSet, toggleFavorite, clearFavorites } =
+    useFavorites();
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Favorites</h1>
+      <div className={styles.headerRow}>
+        <h1 className={styles.title}>Favorites</h1>
+        <Button
+          type='button'
+          variant='ghost'
+          onClick={clearFavorites}
+          disabled={favorites.length === 0}
+        >
+          Clear
+        </Button>
+      </div>
 
       {favorites.length === 0 ? (
         <div className={styles.empty}>No favorites yet. Go save a few 🍸</div>

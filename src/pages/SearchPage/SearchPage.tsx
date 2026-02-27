@@ -1,11 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Input } from '../../components/ui/Input/Input';
 import { Button } from '../../components/ui/Button/Button';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { useDebounce } from '../../hooks/useDebounce';
-import { useLocalStorageState } from '../../hooks/useLocalStorageState';
-import type { Cocktail } from '../../types/cocktail';
+import { useFavorites } from '../../features/favorites/useFavorites';
 import {
   getRandomCocktail,
   searchCocktailsByName,
@@ -13,20 +12,11 @@ import {
 import { CocktailGrid } from '../../components/cocktails/CocktailGrid/CocktailGrid';
 import styles from './SearchPage.module.scss';
 
-const FAV_KEY = 'cocktail_favorites_v1';
-
 export function SearchPage() {
   const [term, setTerm] = useState('');
   const debounced = useDebounce(term, 350);
 
-  const [favorites, setFavorites] = useLocalStorageState<Cocktail[]>(
-    FAV_KEY,
-    [],
-  );
-  const favoritesSet = useMemo(
-    () => new Set(favorites.map((f) => f.id)),
-    [favorites],
-  );
+  const { favoritesSet, toggleFavorite } = useFavorites();
 
   const searchQuery = useQuery({
     queryKey: ['cocktails', 'search', debounced],
@@ -39,13 +29,6 @@ export function SearchPage() {
     queryFn: getRandomCocktail,
     enabled: false,
   });
-
-  function toggleFavorite(c: Cocktail) {
-    setFavorites((prev) => {
-      const exists = prev.some((x) => x.id === c.id);
-      return exists ? prev.filter((x) => x.id !== c.id) : [c, ...prev];
-    });
-  }
 
   const cocktails = searchQuery.data ?? [];
   const showEmpty =
