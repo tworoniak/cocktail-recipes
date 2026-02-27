@@ -8,7 +8,9 @@ Search cocktails by **name** or **build a multi-ingredient query** with smart au
 
 ## 🚀 Live Demo
 
-https://cocktail-recipes-kappa.vercel.app
+[Cocktail Recipe App](https://cocktail-recipes-kappa.vercel.app)
+
+![Cocktail search screen.](/assets/screen-1.jpg 'Search screen.')
 
 ---
 
