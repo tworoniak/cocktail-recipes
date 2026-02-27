@@ -1,0 +1,42 @@
+.card {
+  position: relative;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+  display: grid;
+}
+
+.thumb {
+  width: 100%;
+  aspect-ratio: 1.2 / 1;
+  object-fit: cover;
+  display: block;
+  background: #111;
+}
+
+.meta {
+  padding: 12px 12px 14px;
+}
+
+.name {
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.sub {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}

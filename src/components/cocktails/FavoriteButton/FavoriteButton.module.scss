@@ -1,0 +1,15 @@
+.btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.active {
+  background: rgba(0, 0, 0, 0.55);
+}

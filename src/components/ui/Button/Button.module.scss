@@ -1,0 +1,36 @@
+.button {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.02s ease-in-out;
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.primary {
+  background: var(--accent);
+  color: white;
+
+  &:hover {
+    filter: brightness(0.98);
+  }
+}
+
+.ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+
+  &:hover {
+    background: var(--surface);
+  }
+}
