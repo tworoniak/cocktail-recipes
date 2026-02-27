@@ -71,3 +71,34 @@
   color: var(--muted);
   font-size: 13px;
 }
+
+.modeRow {
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.modeBtn {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+  }
+}
+
+.modeActive {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}

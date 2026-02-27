@@ -26,6 +26,42 @@ type IngredientIndex =
 type IngredientKey = `strIngredient${IngredientIndex}`;
 type MeasureKey = `strMeasure${IngredientIndex}`;
 
+type CocktailDbFilterDrink = {
+  idDrink: string;
+  strDrink: string;
+  strDrinkThumb: string;
+};
+
+type CocktailDbFilterResponse = {
+  drinks: CocktailDbFilterDrink[] | null;
+};
+
+function mapFilterDrinkToCocktail(drink: CocktailDbFilterDrink): Cocktail {
+  return {
+    id: drink.idDrink,
+    name: drink.strDrink,
+    thumbnail: drink.strDrinkThumb,
+    category: undefined,
+    alcoholic: undefined,
+    glass: undefined,
+    instructions: undefined,
+    ingredients: [],
+  };
+}
+
+export async function filterCocktailsByIngredient(
+  ingredient: string,
+): Promise<Cocktail[]> {
+  const q = ingredient.trim();
+  if (!q) return [];
+
+  const data = await fetchJson<CocktailDbFilterResponse>(
+    `${API_BASE}/filter.php?i=${encodeURIComponent(q)}`,
+  );
+
+  return (data.drinks ?? []).map(mapFilterDrinkToCocktail);
+}
+
 export type CocktailDbDrink = {
   idDrink: string;
   strDrink: string;
