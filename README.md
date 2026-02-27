@@ -2,19 +2,31 @@
 
 A modern **React + TypeScript + Vite + Sass** app for discovering cocktail recipes using **TheCocktailDB**.
 
-Search cocktails by **name** or **ingredient**, view details, and save your favorites (persisted in `localStorage`).
+Search cocktails by **name** or **build a multi-ingredient query** with smart autocomplete. View detailed recipes, and save your favorites — all with a polished, responsive UI.
+
+---
+
+## 🚀 Live Demo
+
+https://cocktail-recipes-kappa.vercel.app
 
 ---
 
 ## ✨ Features
 
 - 🔎 Search cocktails by **name**
-- 🧪 Search cocktails by **ingredient**
+- 🧪 Multi-ingredient search with:
+  - Autocomplete suggestions
+  - Keyboard navigation (↑ ↓ Enter Esc)
+  - Include ALL (intersection) or Include ANY (union) toggle
 - 🎲 Random cocktail (name mode)
-- 📄 Cocktail details page (ingredients + instructions)
-- ⭐ Favorites (add/remove) with persistence via `localStorage`
-- ⚡ Fast dev experience with Vite
-- 🎨 SCSS Modules + global tokens/reset
+- 📄 Detailed cocktail page (ingredients + instructions)
+- ⭐ Favorites with localStorage persistence
+- 🔔 Toast notifications (add/remove favorites)
+- 💀 Skeleton loading states for improved UX
+- ⚡ React Query caching + request deduplication
+- ♿ Accessible interactions (ARIA roles + keyboard support)
+- 🎨 Modular SCSS architecture (tokens, mixins, responsive utilities)
 
 ---
 
@@ -124,7 +136,7 @@ src/
     useScrollPosition.ts
 
   services/
-    coacktaildb.ts
+    cocktaildb.ts
 
   styles/
     abstracts/
