@@ -1,0 +1,25 @@
+.viewport {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: grid;
+  gap: 10px;
+  z-index: 9999;
+}
+
+.toast {
+  min-width: 220px;
+  max-width: 320px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(18, 24, 35, 0.92);
+  backdrop-filter: blur(8px);
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  font-weight: 700;
+}
+
+.success {
+  border-color: rgba(124, 92, 255, 0.35);
+}

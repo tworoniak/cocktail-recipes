@@ -1,0 +1,65 @@
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.thumb {
+  width: 100%;
+  aspect-ratio: 1.2 / 1;
+}
+
+.body {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.lineLg {
+  height: 14px;
+  border-radius: 10px;
+  width: 70%;
+}
+
+.lineSm {
+  height: 12px;
+  border-radius: 10px;
+  width: 45%;
+}
+
+.thumb,
+.lineLg,
+.lineSm {
+  background: rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.thumb::after,
+.lineLg::after,
+.lineSm::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
