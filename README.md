@@ -57,17 +57,92 @@ Note: ingredient filtering returns “light” results (id/name/thumb). Full det
 
 ```code
 src/
-  app/                # app shell, router, providers
-  pages/              # route pages (Search, Cocktail, Favorites)
+  app/
+    App.module.scss
+    App.tsx
+    providers.tsx
+    router.tsx
+
+  pages/
+    CocktailPage/
+        CocktailPage.module.scss
+        CocktailPage.tsx
+    FavoritesPage/
+        FavoritesPage.module.scss
+        FavoritesPage.tsx
+    SearchPage/
+        SearchPage.module.scss
+        SearchPage.tsx
+
+
   components/
-    ui/               # shared UI components
-    cocktails/        # cocktail-specific components
+    ui/
+        Button/
+            Button.module.scss
+            Button.tsx
+        InlineSpinner/
+            InlineSpinner.module.scss
+            InlineSpinner.tsx
+        Input/
+            Input.module.scss
+            Input.tsx
+        Scroll/
+            ScrollToTop.tsx
+            ScrollToTopButton.module.scss
+            ScrollToTopButton.tsx
+        Spinner/
+            Spinner.module.scss
+            Spinner.tsx
+
+    cocktails/
+        CocktailCard/
+            CocktailCard.module.scss
+            CocktailCard.tsx
+        CocktailGrid/
+            CocktailGrid.module.scss
+            CocktailGrid.tsx
+        FavoriteButton/
+            FavoriteButton.module.scss
+            FavoriteButton.tsx
+        SkeletonGrid/
+            SkeletonGrid.module.scss
+            SkeletonGrid.tsx
+
   features/
-    favorites/        # favorites hook + shared logic
-  hooks/              # reusable hooks (debounce, localStorage)
-  services/           # API services (cocktaildb)
-  styles/             # tokens, reset, global styles
-  types/              # shared TypeScript types
+    favorites/
+        useFavorites.ts
+    ingredients/
+        useIngredients.ts
+    toast/
+        toast.context.ts
+        toast.module.scss
+        ToastProvider.tsx
+
+  hooks/
+    useDebounce.ts
+    useLocalStorageState.ts
+    useScrollPosition.ts
+
+  services/
+    coacktaildb.ts
+
+  styles/
+    abstracts/
+        _index.scss
+        _mixins.scss
+        _tokens.scss
+        _variables.scss
+    base/
+        _base.scss
+        _index.scss
+        _reset.scss
+        _typography.scss
+    main.scss
+
+  types/
+    cocktail.ts
+
+main.tsx
 ```
 
 ---
