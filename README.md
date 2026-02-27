@@ -43,15 +43,28 @@ https://cocktail-recipes-kappa.vercel.app
 
 ## 🌐 API
 
-- This project uses TheCocktailDB public API:
-- Search by name: search.php?s=...
-- Filter by ingredient: filter.php?i=...
-- Lookup by id: lookup.php?i=...
-- Random: random.php
-- Ingredient autocomplete uses list.php?i=list
-- Multi-ingredient matching is done by intersecting multiple filter.php?i= calls (free-tier workaround) since native multi-ingredient filtering is Premium-only
+This project uses **TheCocktailDB** public API.
 
-Note: ingredient filtering returns “light” results (id/name/thumb). Full details are fetched on the details page.
+Endpoints used:
+
+- search.php?s=... – search by name
+- filter.php?i=... – filter by ingredient
+- lookup.php?i=... – fetch full cocktail details
+- random.php – random cocktail
+- list.php?i=list – ingredient list for autocomplete
+
+### Multi-Ingredient Strategy
+
+TheCocktailDB’s native multi-ingredient filtering is Premium-only.
+
+This app:
+
+- Makes multiple filter.php?i= requests
+- Computes either:
+  - Intersection (ALL ingredients)
+  - Union (ANY ingredient)
+
+This demonstrates client-side data merging and state management.
 
 ---
 
