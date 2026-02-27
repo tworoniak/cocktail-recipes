@@ -79,6 +79,7 @@ export async function filterCocktailsByIngredient(
 
 export async function filterCocktailsByIngredients(
   ingredients: string[],
+  match: 'all' | 'any' = 'all',
 ): Promise<Cocktail[]> {
   const cleaned = ingredients.map((s) => s.trim()).filter(Boolean);
   if (cleaned.length === 0) return [];
@@ -86,9 +87,17 @@ export async function filterCocktailsByIngredients(
 
   const lists = await Promise.all(cleaned.map(filterCocktailsByIngredient));
 
-  // Intersect by cocktail id (must contain all ingredients)
-  const counts = new Map<string, { c: Cocktail; n: number }>();
+  if (match === 'any') {
+    // Union (dedupe by id)
+    const byId = new Map<string, Cocktail>();
+    for (const list of lists) {
+      for (const c of list) byId.set(c.id, c);
+    }
+    return [...byId.values()];
+  }
 
+  // 'all' — intersect by id
+  const counts = new Map<string, { c: Cocktail; n: number }>();
   for (const list of lists) {
     for (const c of list) {
       const entry = counts.get(c.id);

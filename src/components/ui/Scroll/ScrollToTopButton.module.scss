@@ -15,7 +15,7 @@
   border: none;
   cursor: pointer;
   background-color: var(--surface);
-  color: white;
+  color: var(--text);
   opacity: 0;
   pointer-events: none;
   transform: translateY(10px) scale(0.95);

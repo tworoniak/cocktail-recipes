@@ -159,3 +159,38 @@
   color: var(--muted);
   font-size: 13px;
 }
+
+.matchRow {
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  width: max-content;
+}
+
+.matchBtn {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 800;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+  }
+}
+
+.matchActive {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.suggestActive {
+  background: rgba(255, 255, 255, 0.06);
+}

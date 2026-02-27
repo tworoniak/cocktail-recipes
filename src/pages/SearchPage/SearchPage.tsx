@@ -21,21 +21,27 @@ export function SearchPage() {
   const debounced = useDebounce(term, 350);
   const ia = useIngredientAutocomplete();
   const { favoritesSet, toggleFavorite } = useFavorites();
+  const [ingredientMatch, setIngredientMatch] = useState<'all' | 'any'>('all');
+  const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
+  const suggestions = ia.suggestions;
 
   const searchQuery = useQuery({
     queryKey:
       mode === 'name'
         ? ['cocktails', 'name', debounced]
-        : ['cocktails', 'ingredients', selectedIngredients],
+        : ['cocktails', 'ingredients', ingredientMatch, selectedIngredients],
     queryFn: () =>
       mode === 'name'
         ? searchCocktailsByName(debounced)
-        : filterCocktailsByIngredients(selectedIngredients),
+        : filterCocktailsByIngredients(selectedIngredients, ingredientMatch),
     enabled:
       mode === 'name'
         ? debounced.trim().length > 0
         : selectedIngredients.length > 0,
   });
+
+  // after suggestions computed
+  if (activeSuggestion >= suggestions.length) setActiveSuggestion(-1);
 
   const randomQuery = useQuery({
     queryKey: ['cocktails', 'random'],
@@ -113,11 +119,41 @@ export function SearchPage() {
                 placeholder='Add an ingredient (e.g. gin, lime)...'
                 aria-label='Ingredient input'
                 onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (suggestions.length === 0) return;
+                    setActiveSuggestion((i) => (i + 1) % suggestions.length);
+                    return;
+                  }
+
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (suggestions.length === 0) return;
+                    setActiveSuggestion((i) =>
+                      i <= 0 ? suggestions.length - 1 : i - 1,
+                    );
+                    return;
+                  }
+
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    addIngredient(ia.input);
+
+                    // If a suggestion is highlighted, choose it; otherwise add input
+                    const picked =
+                      activeSuggestion >= 0
+                        ? suggestions[activeSuggestion]
+                        : ia.input;
+                    addIngredient(picked);
+                    setActiveSuggestion(-1);
+                    return;
                   }
-                  if (e.key === 'Escape') ia.setInput('');
+
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    ia.setInput('');
+                    setActiveSuggestion(-1);
+                    return;
+                  }
                 }}
               />
               <Button
@@ -127,19 +163,45 @@ export function SearchPage() {
               >
                 Add
               </Button>
+              <div
+                className={styles.matchRow}
+                aria-label='Ingredient match mode'
+              >
+                <button
+                  type='button'
+                  className={`${styles.matchBtn} ${
+                    ingredientMatch === 'all' ? styles.matchActive : ''
+                  }`}
+                  onClick={() => setIngredientMatch('all')}
+                >
+                  Include ALL
+                </button>
+                <button
+                  type='button'
+                  className={`${styles.matchBtn} ${
+                    ingredientMatch === 'any' ? styles.matchActive : ''
+                  }`}
+                  onClick={() => setIngredientMatch('any')}
+                >
+                  Include ANY
+                </button>
+              </div>
             </div>
 
-            {ia.suggestions.length > 0 && (
+            {suggestions.length > 0 && (
               <div
                 className={styles.suggestBox}
                 role='listbox'
                 aria-label='Ingredient suggestions'
               >
-                {ia.suggestions.map((s) => (
+                {suggestions.map((s, idx) => (
                   <button
                     key={s}
                     type='button'
-                    className={styles.suggestItem}
+                    role='option'
+                    aria-selected={idx === activeSuggestion}
+                    className={`${styles.suggestItem} ${idx === activeSuggestion ? styles.suggestActive : ''}`}
+                    onMouseEnter={() => setActiveSuggestion(idx)}
                     onClick={() => addIngredient(s)}
                   >
                     {s}
@@ -173,8 +235,9 @@ export function SearchPage() {
             )}
 
             <div className={styles.hint}>
-              Results show cocktails that include <strong>all</strong> selected
-              ingredients.
+              Results show cocktails that include{' '}
+              <strong>{ingredientMatch === 'all' ? 'all' : 'any'}</strong>{' '}
+              selected ingredients.
             </div>
           </div>
         )}
